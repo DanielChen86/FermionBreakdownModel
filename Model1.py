@@ -152,24 +152,46 @@ class Model1(ModelBase, Entropy1):
 
     def run_hamiltonian(self):
         self.gen_coeffi()
-        self.gen_Hamiltonian()
+        self.gen_Hamiltonian() 
         self.gen_HamiltonianMat()
 
 
 if __name__ == '__main__':
-    model = Model1(M=6, N=3, mu0=1, J0=10, W0=0, random_J=False)
+    N = 3
+    M = 4
+    J = 1
+    Q = int(N*(3**M-1)/8)
+    print(Q)
+    model = Model1(M=M, N=N, mu0=1, J0=J, W0=0, random_J=False, Q = Q)
     model.run_hamiltonian()
     model.run_eigen()
     model.run_entropy()
 
-    plt.scatter(np.arange(model.len_basis), np.sort(model.eig_values), s=3)
-    plt.show()
+    energies = np.sort(model.eig_values)
+    spacings = energies[1:] - energies[:-1]
 
-    plt.hist(model.eig_values_sorted[1:] - model.eig_values_sorted[:-1], 80)
-    plt.xlim(0, 5)
-    plt.ylim(0, 200)
-    plt.show()
+    np.savez_compressed(
+        f'BT_ED_data_N{N}_M{M}_J{J}.npz',
+        energies=energies,
+        eigenvalues=model.eig_values,
+        entropy=model.entanglement_entropy
+    )
 
-    plt.scatter(model.eig_values, model.entanglement_entropy, s=3)
-    plt.axhline(y=np.log(2), linewidth=1, linestyle='dotted', color='purple')
-    plt.show()
+    # np.savez_compressed(
+    #     f'BT_ED_data_N{N}_M{M}_J{J}_GS.npz',
+    #     energies=energies,
+    #     eigenvalues=model.eig_values,
+    #     entropy=model.entanglement_entropy
+    # )
+
+    # plt.scatter(np.arange(model.len_basis), np.sort(model.eig_values), s=3)
+    # plt.show()
+
+    # plt.hist(model.eig_values_sorted[1:] - model.eig_values_sorted[:-1], 80)
+    # plt.xlim(0, 5)
+    # plt.ylim(0, 200)
+    # plt.show()
+
+    # plt.scatter(model.eig_values, model.entanglement_entropy, s=3)
+    # plt.axhline(y=np.log(2), linewidth=1, linestyle='dotted', color='purple')
+    # plt.show()
